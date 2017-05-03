@@ -7,9 +7,3 @@
 
 %Solving Equation Using Explicit Method
 
-%Defining Parameters
-
-ax=-pi;
-ay=-pi;
-bx=pi;
-by=pi;
