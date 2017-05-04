@@ -1,0 +1,22 @@
+%MECE 5397 PROJECT
+%Oscar Rodriguez
+%10717156   
+%
+%Project B- Diffusion Equation
+%Bc2-4
+
+%Solving Equation Using Implicit Method
+
+%Defining Parameters
+
+D=1;
+ax=-pi;
+ay=-pi;
+bx=pi;
+by=pi;
+
+Nxx=39;                          %Number of steps in space(x)
+Nyy=39;                          %Number of steps in space(y)  
+
+x=ax:h1:bx;                      %defining the range of x
+y=ay:h1:by;                      %defining the range of y
