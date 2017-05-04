@@ -18,12 +18,12 @@ ay=-3.14;       %Lower y Limit
 bx=3.14;        %Upper x limit
 by=3.14;        %Upper y Limit
 
-Nxx=39;                          %Number of steps in space(x)
-Nyy=39;                          %Number of steps in space(y)       
+Nxx=45;                          %Number of steps in space(x)
+Nyy=45;                          %Number of steps in space(y)       
 
 
 nt=10000;                         %Number of time steps 
-delta_t=.0065;                      %size time step
+delta_t=.001;                      %size time step
 h1=6.28/(Nxx-1);                 %Size of space step(x)
 
 x=ax:h1:bx;                      %defining the range of x
@@ -48,8 +48,8 @@ for it=0:nt                %Begin time loop
     un=u;                  %definite initial temperature (initial time condition)
     hei=surf(x,y,u');      %Initiation of 3 dimensional graph capable of showing time dependece of problem
     shading interp% color gradient for graph
-       %range of g3D graph
-    title({['2-D Diffusion with D = ',num2str(D)];['time (\itt) = ',num2str(it*delta_t)]})
+    axis ([-3.14 3.14 -3.14 3.14 -500 500])   %range of g3D graph
+    title(['2-D Diffusion' ]) %title for graph
     xlabel('(x)') %lable axixs
     ylabel('(y)') %lable axis
     zlabel('Temperature') %lable axis
