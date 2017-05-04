@@ -5,10 +5,11 @@
 %Project B- Diffusion Equation
 %Bc2-4
 
-%Solving Equation Using Explicit Method
+%Solving Equation Using Implicit Method
 
 %Defining Parameters
 
 ax=-pi;
 ay=-pi;
 bx=pi;
+by=pi;
