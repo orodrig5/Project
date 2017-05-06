@@ -18,27 +18,19 @@ ay=-3.14;       %Lower y Limit
 bx=3.14;        %Upper x limit
 by=3.14;        %Upper y Limit
 
-Nxx=54;                          %Number of steps in space(x)
-Nyy=54;                          %Number of steps in space(y)       
+Nxx=30;                          %Number of steps in space(x)
+Nyy=30;                          %Number of steps in space(y)    
 
-
-nt=100000000;                         %Number of time steps 
-delta_t=.003495;                      %size time step
-h1=6.28/(Nxx-1);                 %Size of space step(x)
+h1=6.28/(Nxx-1);
+delta_t=.999*.25*(h1^2);  
+nt=1000;                         %Number of time steps 
+t=0:delta_t:nt;
+                
 
 x=ax:h1:bx;                      %defining the range of x
 y=ay:h1:by;                      %defining the range of y
 
-lamnda=((2*D*delta_t)/(h1^2))   %lamnda to measure stability of the operation
-
-if lamnda<=.5                    %Testing condition that would make iteration diverge/unstable
-    
-else
-    disp('Given parameters will make calculation blow up')
-    return
-end
-
-                    
+                  
 fa=y.*(y-ay).^2 ;                   %defining f(a)
 ga=((y-ay).^2).*cos(-y); %defining g(a)
 Neuman_ay=0;               %defning the neumand condition given by the problem             
@@ -47,19 +39,10 @@ un=zeros(Nxx,Nyy);         %initioal grid for temperature, Initial time conditio
 
 u(1,:)=ga; %detriclet non linear  condition in the  right side boundary
 u(Nxx,:)=fa; %detriclet condition non linear condition left side boudary 
-u(:,Nyy)=fa(54)+((x+3.14)/(6.28)*(ga(54)-fa(54))); %detrichlet condition upper boundary 
+u(:,Nyy)=fa(Nxx)+((x+3.14)/(6.28)*(ga(Nxx)-fa(Nxx))); %detrichlet condition upper boundary 
 for it=0:nt                %Begin time loop
-    un=u;                  %definite initial temperature (initial time condition)
-    hei=surf(x,y,u');      %Initiation of 3 dimensional graph capable of showing time dependece of problem
-    shading interp% color gradient for graph
-    xlabel('(x)') %lable axixs
-    ylabel('(y)') %lable axis
-    zlabel('Temperature') %lable axis
+    un=u; %definite initial temperature (initial time condition)
    
-    title({['2-D Diffusion with D = ',num2str(D)];['time (\itt) = ',num2str(it*delta_t)]})
-      
-    drawnow;
-    refreshdata(hei) %frefresh of graph per time interval
     %% Explicit Method Iteration
      
    for j=2:Nyy-1 %initiation of iterative process to calculate temperature (y axis)
@@ -70,5 +53,16 @@ for it=0:nt                %Begin time loop
     
     end %end for loop for iteration process of x
    end  %end for loop for iteration process of y 
+    hei=surf(x,y,u);      %Initiation of 3 dimensional graph capable of showing time dependece of problem
+    shading interp% color gradient for graph
+    xlabel('(x)') %lable axixs
+    ylabel('(y)') %lable axis
+    zlabel('Temperature') %lable axis
    
+    title({['2-D Diffusion with D = ',num2str(D)];['time (\itt) = ',num2str(it*delta_t)]})
+      
+    drawnow;
+    
+    
+    refreshdata(hei) %frefresh of graph per time interval
 end %end time loop
