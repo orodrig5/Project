@@ -12,6 +12,8 @@
 clear all
 clc
 
+tic
+
 D=1;            %Given difrusivity       
 ax=-3.14;       %Lower x Limit
 ay=-3.14;       %Lower y Limit  
@@ -22,8 +24,8 @@ Nxx=30;                          %Number of steps in space(x)
 Nyy=30;                          %Number of steps in space(y)    
 
 h1=6.28/(Nxx-1);
-delta_t=.999*.25*(h1^2);  
-nt=1000;                         %Number of time steps 
+delta_t=.999*.25*(h1^2)  
+nt=10;                         %Number of time steps 
 t=0:delta_t:nt;
                 
 
@@ -66,3 +68,5 @@ for it=0:nt                %Begin time loop
     
     refreshdata(hei) %frefresh of graph per time interval
 end %end time loop
+
+toc
