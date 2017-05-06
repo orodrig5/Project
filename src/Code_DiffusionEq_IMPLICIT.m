@@ -1,79 +1,85 @@
-%implicit testing
-clear all
-clc
-D=1;            %Given difrusivity       
-ax=-3.14;       %Lower x Limit
-ay=-3.14;       %Lower y Limit  
-bx=3.14;        %Upper x limit
-by=3.14;        %Upper y Limit
+%MECE 5397 PROJECT
+%Oscar Rodriguez
+%10717156   
+%
+%Project B- Diffusion Equation
+%Bc2-4
 
-Nxx=39;                          %Number of steps in space(x)
-Nyy=39;                          %Number of steps in space(y)       
+%Solving Equation Using Explicit Method
 
-nt=0.5;                         %Number of time steps 
-delta_t=.065;                    %size time step
-h1=6.28/(Nxx);                  %Size of space step(x)
+%Defining Parameters
 
-u=zeros(Nxx+1,Nyy+1);          %Creating the grid for temperature        
-un=zeros(Nxx+1,Nyy+1);         %initioal grid for temperature, Initial time condition is also represented by this line
-x=ax:h1:bx;                      %defining the range of x
-y=ay:h1:by;                      %defining the range of y
+bx=6.28; by=6.28; lb=2; 
+u_initial=0; 
+D=1; %Deffusive 
+
+Xx=60; Yy=60; %Mesh size
+nx=Xx+1; ny=Yy+1; %Finding the correct size for iteration of the tridiagonals
+dx=bx/Xx; dy=by/Yy; %Space steps
+del=(dx*dx)/(dy*dy); %dummy variable used in tridiagonal calulation
+dt=0.99; tn=20; %time step size and total time of calculation
+lambda=D*dt/(dx*dx); %lamda needed for the coefficients of the tridiagonal matrix
+x=linspace(0,bx,nx); y=linspace(0,by,ny); %size of x and y coordinates
 
 
+u=zeros(nx,ny); u(:,:)=u_initial;
 
-fa=y.*(y-ay).^2 ;                   %defining f(a)
-ga=((y-ay).^2).*cos(3.14.*y/(ay)); %defining g(a)
-Neuman_ay=0;               %defning the neumand condition given by the problem
+% boundary conditions
+%left b.c.
+fa=y.*(y).^2 ;                   %defining f(a)
+ga=((y).^2).*cos(-y);            %defining g(a)
 
-u(1,:)=ga; %detriclet non linear  condition in the  right side boundary
-u(Nxx,:)=fa; %detriclet condition non linear condition left side boudary 
-u(:,Nyy)=fa(39)+((x+3.14)/(6.28)*(ga(39)-fa(39))); %detrichlet condition upper boundary 
+u(1,:)=ga; %left boundary condition
 
-lambda=((2*D*delta_t)/(h1^2))
-a1(2:Nxx)=1;
-b1(1:Nxx+1)=-2-2/lambda;
-c1(1:Nxx+1)=1;
-d1(1:Nxx+1)=0;
-a1(1)=0;b1(1)=1;c1(1)=0;
-a1(Nxx+1)=0;b1(Nxx+1)=1;c1(Nxx+1)=0;
-a2(1:Nyy+1)=1;
-b2(1:Nyy+1)=-2-2/lambda;
-c2(1:Nyy+1)=1;  
+u(nx,:)=fa; % right boundary condition
+
+% top boundary
+u(:,ny)=fa(ny)+((x+3.14)/(6.28)*(ga(ny)-fa(ny))); %top boundary condition
+Neuman_ay=0;%dummy for variable for the neuman boundary
+
+
+surf(x,y,u'); shading interp;
+
+
+%defining coefficents for the varilables in the tridiagonal matrix
+g1(2:Xx)=1;
+b1(1:Xx+1)=-2-2/lambda;
+c1(1:Xx+1)=1;
+f1(1:Xx+1)=0;
+g1(1)=0;b1(1)=1;c1(1)=0;
+g1(Xx+1)=0;b1(Xx+1)=1;c1(Xx+1)=0;
+a2(1:Yy+1)=del;
+b2(1:Yy+1)=-2*del-2/lambda;
+c2(1:Yy+1)=del;
 a2(1)=0;b2(1)=1;c2(1)=0;
-a2(Nyy+1)=0;b2(Nyy+1)=1;c2(Nyy+1)=0;
-d2(1:Nyy+1)=0;
-uhalf=zeros(Nxx+1,Nyy+1);
+a2(Yy+1)=0;b2(Yy+1)=1;c2(Yy+1)=0;
+f2(1:Yy+1)=0;
+uhalf=zeros(nx,ny);
 t=0;
+%building up the matrix for the tridiagonal
+while (t<tn)
+for j=2:Yy%visiting the columns to create left side matrix
+f1(1)=u(1,j);
+f1(Xx+1)=u(Xx+1,j);
+for i=2:Xx%visiting the rows tp create left side matrix
+f1(i)=-del*u(i,j-1)-del*u(i,j+1)+(2*del-2/lambda)*u(i,j);
+end;
+uhalf(:,j)=tridiag(Xx+1,g1,b1,c1,f1);
+end;
+for i=2:Xx
+f2(1)=u(i,1);
+f2(Yy+1)=u(i,Yy+1);
+for j=2:Yy %gitvisiting the columns to create right side matrix
+f2(j)=-uhalf(i-1,j)-uhalf(i+1,j)+(2-2/lambda)*uhalf(i,j);
+end;
+u(i,:)=tridiag(Yy+1,a2,b2,c2,f2);
+end;
+t=t+dt;
 
-for it=0:nt
-    %un=u;                  %definite initial temperature (initial time condition)
-    hei=surf(x,y,u');      %Initiation of 3 dimensional graph capable of showing time dependece of problem
-    shading interp% color gradient for graph
-    xlabel('(x)') %lable axixs
-    ylabel('(y)') %lable axis
-    zlabel('Temperature') %lable axis
-   
-    title({['2-D Diffusion with D = ',num2str(D)];['time (\itt) = ',num2str(it*delta_t)]})
-      
-    drawnow;
-    refreshdata(hei) %frefresh of graph per time interval
-for j=2:Nyy
-% call TDMA
-d1(1)=u(1,j);
-d1(Nxx+1)=u(Nxx,j);
-for i=2:Nxx
-d1(i)=-1*u(i,j-1)-1*u(i,j+1)+(2*1-2/lambda)*u(i,j);
-end; 
-uhalf(:,j)=tridiag(Nxx+1,a1,b1,c1,d1);
+fprintf('\n');
+set(gca,'zlim',[0 70]);
+hei=surf(x,y,u');
+shading interp;
+ u(:,1)=u(:,2)-Neuman_ay*dx;%neuman boundary
 end;
-for i=2:Nxx
-    % call TDMA
-d2(1)=u(i,1);
-d2(Nyy+1)=u(i,Nyy+1);
-for j=2:Nyy
-d2(j)=-uhalf(i-1,j)-uhalf(i+1,j)+(2-2/lambda)*uhalf(i,j);
-end; 
-u(:,1)=u(:,2)-Neuman_ay*h1; %Neuman condition bottom boundary
-u(i,:)=tridiag(Nyy+1,a2,b2,c2,d2);
-end;
-end
+  
